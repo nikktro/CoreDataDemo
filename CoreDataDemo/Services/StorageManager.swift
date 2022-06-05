@@ -11,11 +11,14 @@ import CoreData
 class StorageManager {
     
     static let shared = StorageManager()
+    
+    var taskList: [Task] = []
+    
+    private let context = AppDelegate().persistentContainer.viewContext
+    
     private init() {}
     
-    private var taskList: [Task] = []
-    
-    func fetchData(context: NSManagedObjectContext) {
+    func fetchData() {
         let fetchRequest = Task.fetchRequest()
         
         do {
@@ -23,6 +26,22 @@ class StorageManager {
         } catch let error {
             print("Failed to fetch data", error)
         }
+    }
+    
+    func save(_ taskName: String) {
+        guard let entityDescription = NSEntityDescription.entity(forEntityName: "Task", in: context) else { return }
+        guard let task = NSManagedObject(entity: entityDescription, insertInto: context) as? Task else { return }
+        task.title = taskName
+        taskList.append(task)
+        
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch let error {
+                print(error)
+            }
+        }
+        
     }
 
 }
