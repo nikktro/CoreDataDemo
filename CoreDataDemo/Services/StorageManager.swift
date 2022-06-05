@@ -33,7 +33,22 @@ class StorageManager {
         guard let task = NSManagedObject(entity: entityDescription, insertInto: context) as? Task else { return }
         task.title = taskName
         taskList.append(task)
-        
+        saveContextChanges()
+    }
+    
+    func update(indexPath: IndexPath, newText: String) {
+        taskList[indexPath.row].title = newText
+        saveContextChanges()
+    }
+    
+    func delete(indexPath: IndexPath) {
+        let task = taskList[indexPath.row]
+        context.delete(task)
+        taskList.remove(at: indexPath.row)
+        saveContextChanges()
+    }
+    
+    func saveContextChanges() {
         if context.hasChanges {
             do {
                 try context.save()
@@ -41,7 +56,6 @@ class StorageManager {
                 print(error)
             }
         }
-        
     }
 
 }
